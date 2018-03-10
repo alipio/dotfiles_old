@@ -1,0 +1,39 @@
+# OS generated files
+*~
+._*
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+
+# Compiled source
+*.class
+*.o
+*.pyc
+*.so
+.sass-cache
+
+# Logs and databases
+*.log
+*.sqlite
+*.sqlite3
+
+# Swap files
+*.swp
+
+# Projects
+*.tmproj
+.tm_properties
+.bundle/
+*.sublime-project
+*.sublime-workspace
+.byebug_history
+.vscode/
+node_modules/
+bower_components/
+npm-debug.log
+
+# CTags
+tags
+.tags
+.gemtags
+

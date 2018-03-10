@@ -1,0 +1,15 @@
+--recurse=yes
+--exclude=.git
+--exclude=vendor
+--exclude=bower_components
+--exclude=node_modules
+--exclude=log
+--exclude=public
+--exclude=tmp
+--languages=-javascript,sql
+
+--langmap=ruby:+.rake
+--regex-ruby=/(^|[:;])[ \t]*([A-Z][[:alnum:]_]+) *=/\2/c,class,constant/
+--regex-ruby=/(^|;)[ \t]*(has_many|belongs_to|has_one|has_and_belongs_to_many)\(? *:([[:alnum:]_]+)/\3/f,function,association/
+--regex-ruby=/(^|;)[ \t]*(named_)?scope\(? *:([[:alnum:]_]+)/\3/f,function,named_scope/
+--regex-ruby=/^[ \t]*attr_(reader|writer|accessor) (:[a-z0-9_]+, )*:([a-z0-9_]+)/\3/A,attr/

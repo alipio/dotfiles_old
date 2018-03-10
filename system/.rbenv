@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Bootstrap rbenv
+if is-executable rbenv; then
+  eval "$(rbenv init -)"
+
+  alias rubies="rbenv versions"
+fi
+

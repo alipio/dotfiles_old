@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Bash
+is-executable brew && [ -f $(brew --prefix)/share/bash-completion/bash_completion ] && . $(brew --prefix)/share/bash-completion/bash_completion
+
+# Dotfiles
+_dotfiles_completions() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  COMPREPLY=( $(compgen -W '`dotfiles completion`' -- $cur ) )
+}
+
+complete -o default -F _dotfiles_completions dotfiles
+
+# killall
+complete -o "nospace" -W "Contacts Calendar Dashboard Dock Finder Mail iTunes SystemUIServer Terminal" killall;
+
+# Homebrew
+is-executable brew && [ -f $(brew --prefix)/etc/bash_completion.d/brew ] && . $(brew --prefix)/etc/bash_completion.d/brew
+
+# Git
+if type _git &> /dev/null && [ -f $(brew --prefix)/etc/bash_completion.d/git-completion.bash ]; then
+  complete -o default -o nospace -F _git g
+fi

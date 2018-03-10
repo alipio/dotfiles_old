@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Start with system path
+# Retrieve it from getconf, otherwise it's just current $PATH
+is-executable getconf && PATH=$(`command -v getconf` PATH)
+
+# Prepend new items to path (if directory exists)
+prepend-path "/usr/local/bin"
+prepend-path "$DOTFILES_BREW_PREFIX_COREUTILS/libexec/gnubin"
+prepend-path "$DOTFILES_DIR/bin"
+prepend-path "$HOME/bin"
+
+# Remove duplicates (preserving prepended items)
+# Source: http://unix.stackexchange.com/a/40755
+PATH=`echo -n $PATH | awk -v RS=: '!a[$0]++ { if (NR > 1) printf(":"); printf("%s", $0) }'`
+
+# Wrap up
+export PATH

@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+# Shortcuts
+alias reload="source ~/.bash_profile"
+alias _="sudo"
+alias g="git"
+
+# Easier navigation
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias -- -="cd -"
+alias d="cd ~/Dropbox"
+alias dl="cd ~/Downloads"
+alias dt="cd ~/Desktop"
+
+# Default options
+alias rsync="rsync -vh"
+alias psgrep="psgrep -i"
+
+is-executable hub && eval "$(hub alias -s)" # alias git=hub
+
+# List declared aliases, functions, paths
+alias aliases="alias | sed 's/=.*//'"
+alias functions="declare -f | grep '^[a-z].* ()' | sed 's/{$//'"
+alias paths='echo -e ${PATH//:/\\n}'
+
+# Directory listing/traversal
+LS_COLORS=`is-supported "ls --color" --color -G`
+LS_TIMESTYLEISO=`is-supported "ls --time-style=long-iso" --time-style=long-iso`
+LS_GROUPDIRSFIRST=`is-supported "ls --group-directories-first" --group-directories-first`
+
+alias ll="ls -alh $LS_COLORS $LS_TIMESTYLEISO $LS_GROUPDIRSFIRST"
+alias lsd="ll | grep --color=never '^d'"
+
+unset LS_COLORS LS_TIMESTYLEISO LS_GROUPDIRSFIRST
+
+# Intuitive map function
+# For example, to list all directories that contain a certain file:
+# find . -name .gitattributes | map dirname
+alias map="xargs -n1"
+
+# npm
+alias ni="npm install"
+alias nid="npm install -D"
+alias nig="npm install -g"
+alias nu="npm uninstall"
+alias nug="npm uninstall -g"
+alias nup="npm update"
+alias nri="rm -rf node_modules && ni"
+alias nlg="npm list -g --depth=0"
+
+# bundler
+alias be="bundle exec"
+alias bi="bundle install"
+
+# Shorthand Ruby
+alias rb="ruby"
+
+# git
+alias gaa='git add --all'
+alias gap='git add --patch'
+alias gd='git diff'
+alias gst='git status -sb'
+alias gl='git log --pretty="format:%C(yellow)%h%Creset %s %Cgreen(%cr) %C(bold blue)%an%Creset" --graph'
+alias gc='git clone'
+alias gcp='git cherry-pick'
+alias gp='git push'
+alias gpt='git push --tags'
+alias gpf='git push --force-with-lease'
+alias grb='git rebase'
+alias gri='git rebase -i'
+alias grc='git rebase --continue'
+alias gra='git rebase --abort'
+alias gf='git fetch'
+alias gfr='git fetch && git rebase'
+alias gfrm='git fetch && git rebase origin/master'
+alias gb='git branch'
+alias gbd='git branch -D'
+alias gci='git commit -am'
+alias gco='git checkout'
+alias gcob='git checkout -b'
+alias gcom='gco master'
+alias gpr='git pull --rebase'
+alias gm='git merge --no-ff'
+alias grh='git reset --hard'
+alias gmt='git mergetool'
+alias gcd='cd "`git rev-parse --show-toplevel`"'
+
+# Miscellaneous
+alias hosts="sudo $EDITOR /etc/hosts"
+alias quit="exit"
+alias week="date +%V"
+alias tlf="tail -f"

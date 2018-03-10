@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+
+PATH="$HOME/.rbenv/shims:$HOME/.rbenv/bin:/usr/local/bin:$PATH"
+dir="`git rev-parse --git-dir`"
+trap 'rm -f "$dir/$$.tags"' EXIT INT TERM
+
+git ls-files | \
+  ctags -f "$dir/$$.tags" -L - --languages=-javascript,sql
+
+[ -f Gemfile ] && command -v bundle >/dev/null && \
+  ctags -a -R -f "$dir/$$.tags" --languages=-javascript,sql $(bundle show --paths)
+
+mv "$dir/$$.tags" .tags

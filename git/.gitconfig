@@ -1,0 +1,99 @@
+[user]
+  name = Alipio de Paula
+  email = alipiodepaula@gmail.com
+
+[alias]
+  unstage = reset HEAD --
+  discard = checkout --
+  nevermind = !git reset --hard HEAD && git clean -df
+  amend = !git commit --amend -v --date="$(date +%Y-%m-%dT%H:%M:%S)"
+  branches = branch -a
+  remotes = remote -v
+  tags = tag
+  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+  back = checkout "-"
+  last = log -1 HEAD --format=format:"%C(yellow)%H"
+  commits = log --oneline --color --decorate=short --abbrev-commit
+  patch = !git diff --no-pager --no-color
+  ahead-of-master = log --oneline --color origin/master..
+  unpushed = log --oneline --color @{u}..
+  cleanup = !git remote prune origin && git gc && git clean -d -f && git stash clear
+  aliases = !git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\:\\ /
+
+[core]
+  autocrlf = input
+
+  # Use custom `.gitignore_global`
+  excludesfile = ~/.gitignore_global
+
+  # Speed up commands involving untracked files such as `git status`.
+  # https://git-scm.com/docs/git-update-index#_untracked_cache
+  untrackedCache = true
+
+  # Good-lookin' diffs
+  pager = diff-so-fancy | less --tabs=4 -RFX
+
+[init]
+  templatedir = ~/.git_template
+
+[diff]
+  compactionHeuristic = true
+
+[pretty]
+  # tut: http://gitimmersion.com/lab_10.html
+  # ref: http://linux.die.net/man/1/git-log
+  nice = "%C(yellow)%h%Creset%Cred%d%Creset - %s %Cgreen(%cr) %C(magenta)<%an>%Creset"
+
+[color]
+  # Use colors in Git commands that are capable of colored output when
+  # outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
+  ui = auto
+
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+
+[color "diff-highlight"]
+  oldNormal = red bold
+  oldHighlight = red bold 52
+  newNormal = green bold
+  newHighlight = green bold 22
+
+[color "diff"]
+  meta = yellow
+  frag = magenta bold # line info
+  old = red bold # deletions
+  new = green bold # additions
+  commit = yellow bold
+  whitespace = red reverse
+
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = cyan
+
+[help]
+  # Automatically correct and execute mistyped commands
+  autocorrect = 1
+
+[push]
+  # https://git-scm.com/docs/git-config#git-config-pushdefault
+  default = simple
+
+[fetch]
+  prune = true
+
+[rebase]
+  autosquash = true
+
+[merge]
+  conflictstyle = diff3
+  tool = diffmerge
+
+[mergetool "diffmerge"]
+  trustExitCode = true
+  cmd = /usr/local/bin/diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+
+[mergetool]
+  keepBackup = false

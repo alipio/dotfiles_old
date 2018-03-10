@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+
+[ -f .git/hooks/ctags ] || git init
+.git/hooks/ctags

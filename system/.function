@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# Create a new directory and enter it
+mkd() {
+  mkdir -p "$@" && cd "$@"
+}
+
+# Fuzzy find file/dir
+ff() { find . -type f -iname "$1"; }
+fff() { find . -type f -iname "*$1*"; }
+fd() { find . -type d -iname "$1"; }
+fdf() { find . -type d -iname "*$1*"; }
+
+# Show disk usage of current folder, or list with depth
+duf() {
+  du --max-depth=${1:-0} -h | sort -rh
+}
+
+# Get named var (usage: get "VAR_NAME")
+get() {
+  echo "${!1}"
+}
+
+# Add to path
+prepend-path() {
+  [ -d $1 ] && PATH="$1:$PATH"
+}
+
+# Markdown
+md() {
+  pandoc $1 | lynx -stdin
+}
+
+# `s` with no arguments opens the current directory in Sublime Text, otherwise
+# opens the given location
+s() {
+  subl ${1:-.}
+}
+
+# Webserver
+srv() {
+  local DIR=${1:-.}
+  local PORT=${2:-8888}
+  open "http://localhost:$PORT"
+  superstatic "$DIR" -p "$PORT"
+}

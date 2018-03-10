@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+_rails_command() {
+  if [ -x bin/rails ]; then
+    bin/rails "$@"
+  elif [ -x script/rails ]; then
+    script/rails "$@"
+  elif type bundle &> /dev/null && [ -f Gemfile.lock ]; then
+    bundle exec rails "$@"
+  else
+    rails "$@"
+  fi
+}
+
+_rake_command() {
+  if [ -x bin/rake ]; then
+    bin/rake "$@"
+  elif [ -x script/rake ]; then
+    script/rake "$@"
+  elif type bundle &> /dev/null && [ -f Gemfile.lock ]; then
+    bundle exec rake "$@"
+  else
+    rake "$@"
+  fi
+}
+
+_rspec_command() {
+  if [ -x bin/rspec ]; then
+    bin/rspec "$@"
+  elif type bundle &> /dev/null && [ -f Gemfile.lock ]; then
+    bundle exec rspec "$@"
+  else
+    rspec "$@"
+  fi
+}
+
+alias rails='_rails_command'
+alias rake='_rake_command'
+alias rspec='_rspec_command'
+
+alias devlog='tail -f log/development.log'
+alias testlog='tail -f log/test.log'
+alias rc='rails console'
+alias rg='rails generate'
+alias rgm='rails generate migration'
+alias rs='rails server'
+alias rr='rake routes'
+alias rrg='rake routes | grep'
+
+alias setup='bundle install && rake db:setup db:test:prepare'
+alias restartapp='touch tmp/restart.txt'
+alias resetdb='rake db:drop db:create db:migrate db:seed db:test:prepare'
+alias migrate='rake db:migrate db:rollback && rake db:migrate db:test:prepare'
+alias cops='rubocop -a'
+alias spec='rspec --color'
+alias clearlogs='rake log:clear'

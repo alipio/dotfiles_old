@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# Stage all files that were deleted
+
+git diff -z --name-only --diff-filter=D | xargs -0 git rm

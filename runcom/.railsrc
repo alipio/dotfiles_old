@@ -1,0 +1,4 @@
+--database=postgresql
+--skip-spring
+--skip-test-unit
+--skip-action-cable
