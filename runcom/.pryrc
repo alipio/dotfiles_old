@@ -23,7 +23,7 @@ Pry.config.history.file = File.expand_path('~/.pry_history')
 Pry.config.prompt_name = File.basename(Dir.pwd)
 prompt_proc = lambda do |obj, nest_level, _|
   ruby_info = ""
-  ruby_info << "#{Rails.version}@" if defined?(Rails)
+  ruby_info << "#{Rails.version}\#" if defined?(Rails)
   ruby_info << RUBY_VERSION
   ruby_info = "\e[32m#{ruby_info}\e[0m"
   nest_info = "#{nest_level}"
@@ -82,6 +82,7 @@ default_command_set = Pry::CommandSet.new do
       pp "No rails env defined"
     end
   end
+
   command "caller_method" do |depth|
     depth = depth.to_i || 1
     if /^(.+?):(\d+)(?::in `(.*)')?/ =~ caller(depth + 1).first
