@@ -70,7 +70,11 @@ bash_prompt_command() {
   # Parse Git branch name
   P_GIT=$(__git_ps1 " ${P_RESET}on ${P_GREEN}[%s]")
 
-  PS1="${P_USER}${P_WHITE}@${P_HOST} ${P_YELLOW}${P_PWD}${P_GIT}\n${P_YELLOW}❯ ${P_RESET}"
+  if [ "$SSH_CONNECTION" ]; then
+    PS1="${P_USER}${P_WHITE}@${P_HOST} ${P_YELLOW}${P_PWD}${P_GIT}\n${P_YELLOW}❯ ${P_RESET}"
+  else
+    PS1="${P_YELLOW}${P_PWD}${P_GIT}\n${P_YELLOW}❯ ${P_RESET}"
+  fi
 }
 
 _bash_prompt_config
