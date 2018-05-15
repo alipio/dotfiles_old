@@ -90,11 +90,16 @@
 
 [merge]
   conflictstyle = diff3
-  tool = diffmerge
+  tool = meld
+
+[mergetool]
+  keepBackup = false
+  prompt = false
 
 [mergetool "diffmerge"]
   trustExitCode = true
   cmd = /usr/local/bin/diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 
-[mergetool]
-  keepBackup = false
+[mergetool "meld"]
+  trustExitCode = true
+  cmd = open -W -a Meld --args --auto-merge \"$LOCAL\" \"$BASE\" \"$REMOTE\" --output=\"$MERGED\"
