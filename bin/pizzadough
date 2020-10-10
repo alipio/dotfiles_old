@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# Exit when a command fails.
+set -o errexit
+# Exit on error inside any functions or subshells.
+set -o errtrace
+# Do not allow use of undefined vars. Use ${VAR:-} to use an undefined VAR
+set -o nounset
+# Catch the error in case mysqldump fails (but gzip succeeds) in `mysqldump |gzip`
+set -o pipefail
+
+#set -x
+
+ball_count="2"
+ball_weight="250"
+
+# Baker's percentages
+flour_percentage="1.0"
+water_percentage="0.57"
+salt_percentage="0.03"
+yeast_percentage="0.002"
+
+for ARG in $*; do
+  case $ARG in
+    -c=*|--count=*)
+      ball_count=${ARG#*=}
+      ;;
+    --weight=*)
+      ball_weight=${ARG#*=}
+      ;;
+    -w=*|--water-percentage=*)
+      water_percentage=${ARG#*=}
+      water_percentage=$(echo "${water_percentage} / 100" | bc -l);
+      ;;
+    *)
+      echo "Unknown Argument $ARG" ;;
+  esac
+done
+
+# the sum of all the Baker's percentages is called the formula percentage
+formula_percentage=$(echo "${flour_percentage} + ${water_percentage} + ${salt_percentage} + ${yeast_percentage}" | bc -l);
+dough_weight=$(echo "${ball_weight} * ${ball_count}" | bc -l)
+
+flour=$(echo "${dough_weight} / ${formula_percentage}" | bc -l);
+water=$(echo "${flour} * ${water_percentage}" | bc -l);
+salt=$(echo "${flour} * ${salt_percentage}" | bc -l);
+yeast=$(echo "${flour} * ${yeast_percentage}" | bc -l);
+
+printf "Ingredients\n"
+printf "%s: %.2f\n" "flour" "${flour}"
+printf "%s: %.2f\n" "water" "${water}"
+printf "%s: %.2f\n" "salt" "${salt}"
+printf "%s: %.2f\n" "yeast" "${yeast}"

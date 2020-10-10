@@ -38,6 +38,13 @@ if is-macos; then
   done
 fi
 
+# if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
+#   __GIT_PROMPT_DIR=$(brew --prefix)/opt/bash-git-prompt/share
+#   GIT_PROMPT_ONLY_IN_REPO=1
+#   GIT_PROMPT_THEME=Custom
+#   source "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh"
+# fi
+
 # Hook for extra/custom stuff
 
 DOTFILES_EXTRA_DIR="$HOME/.extra"

@@ -1,15 +1,24 @@
 #!/usr/bin/env bash
 
 # Create a new directory and enter it
-mkd() {
+take() {
   mkdir -p "$@" && cd "$@"
 }
 
-# Fuzzy find file/dir
-ff() { find . -type f -iname "$1"; }
-fff() { find . -type f -iname "*$1*"; }
-fd() { find . -type d -iname "$1"; }
-fdf() { find . -type d -iname "*$1*"; }
+fco() {
+  local tags branches target
+  branches=$(
+    git --no-pager branch --all \
+      --format="%(if)%(HEAD)%(then)%(else)%(if:equals=HEAD)%(refname:strip=3)%(then)%(else)%1B[0;34;1mbranch%09%1B[m%(refname:short)%(end)%(end)" \
+    | sed '/^$/d') || return
+  tags=$(
+    git --no-pager tag | awk '{print "\x1b[35;1mtag\x1b[m\t" $1}') || return
+  target=$(
+    (echo "$branches"; echo "$tags") |
+    fzf --no-hscroll --no-multi -n 2 \
+        --ansi) || return
+  git checkout $(awk '{print $2}' <<<"$target" )
+}
 
 # Show disk usage of current folder, or list with depth
 duf() {
@@ -37,10 +46,28 @@ s() {
   subl ${1:-.}
 }
 
+uuid() {
+  uuidgen | tr '[:upper:]' '[:lower:]' | tr -d '\n' | tee >(pbcopy); printf "\n"
+}
+
 # Webserver
 srv() {
   local DIR=${1:-.}
   local PORT=${2:-8888}
   open "http://localhost:$PORT"
   superstatic "$DIR" -p "$PORT"
+}
+
+# Open a Bundled Gem in Sublime Text
+gs () {
+  $EDITOR $(bundle show $1)
+}
+
+# git-foresta
+function gifo() {
+  git-foresta --style=10 "$@" | less -RSX
+}
+
+function gifa() {
+  git-foresta --all --style=10 "$@" | less -RSX
 }

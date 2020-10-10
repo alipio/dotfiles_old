@@ -31,6 +31,9 @@ Thumbs.db
 node_modules/
 bower_components/
 npm-debug.log
+scratch.txt
+.env.qa
+.env.prod
 
 # CTags
 tags

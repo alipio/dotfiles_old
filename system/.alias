@@ -58,12 +58,14 @@ alias bi="bundle install"
 alias rb="ruby"
 
 # git
+function clonecd() {  git clone $1 && cd `basename ${1/.git//}` ; }
+
 alias gaa='git add --all'
 alias gap='git add --patch'
 alias gd='git diff'
 alias gst='git status -sb'
-alias gl='git log --pretty="format:%C(yellow)%h%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --graph'
-alias gc='git clone'
+alias gl='git log --pretty=nice --graph --date=short'
+alias gc='clonecd'
 alias gcp='git cherry-pick'
 alias gp='git push'
 alias gpt='git push --tags'

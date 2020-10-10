@@ -5,19 +5,18 @@
 [alias]
   unstage = reset HEAD --
   discard = checkout --
-  nevermind = !git reset --hard HEAD && git clean -df
+  pristine = !git reset --hard HEAD && git clean -df
   amend = !git commit --amend -v --date="$(date +%Y-%m-%dT%H:%M:%S)"
+  recommit = commit --amend --no-edit
   branches = branch -a
   remotes = remote -v
   tags = tag
   go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
   back = checkout "-"
-  last = log -1 HEAD --format=format:"%C(yellow)%H"
-  commits = log --oneline --color --decorate=short --abbrev-commit
   patch = !git diff --no-pager --no-color
-  ahead-of-master = log --oneline --color origin/master..
-  unpushed = log --oneline --color @{u}..
+  review-unpushed = log --oneline --color @{u}..
   cleanup = !git remote prune origin && git gc && git clean -d -f && git stash clear
+  pick = cherry-pick
   aliases = !git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\:\\ /
 
 [core]
@@ -33,16 +32,26 @@
   # Good-lookin' diffs
   pager = diff-so-fancy | less --tabs=4 -RFX
 
+  whitespace = -trailing-space
+
 [init]
   templatedir = ~/.git_template
 
 [diff]
   compactionHeuristic = true
 
-[pretty]
-  # tut: http://gitimmersion.com/lab_10.html
-  # ref: http://linux.die.net/man/1/git-log
-  nice = "%C(yellow)%h%Creset%Cred%d%Creset - %s %Cgreen(%cr) %C(magenta)<%an>%Creset"
+  # Use better, descriptive initials (c, i, w) instead of a/b.
+  mnemonicPrefix = true
+
+  # Show renames/moves as such
+  renames = true
+
+[format]
+  pretty = tformat:%Cred%h%Creset %s %Cgreen(%an, %ad)%Creset
+
+[log]
+  date = iso
+  abbrevCommit = true
 
 [color]
   # Use colors in Git commands that are capable of colored output when
@@ -75,31 +84,40 @@
 
 [help]
   # Automatically correct and execute mistyped commands
-  autocorrect = 1
-
-[push]
-  # https://git-scm.com/docs/git-config#git-config-pushdefault
-  default = simple
+  autoCorrect = 1
 
 [fetch]
   prune = true
 
+[pull]
+  rebase = preserve
+
+[push]
+  # https://git-scm.com/docs/git-config#git-config-pushdefault
+  default = upstream
+
+  # When pushing, also push tags whose commit-ishs are now reachable upstream
+  followTags = true
+
 [rebase]
-  autosquash = true
-  autostash = true
+  autoSquash = true
+  autoStash = true
 
 [merge]
-  conflictstyle = diff3
-  tool = meld
+  conflictStyle = diff3
+  tool = kdiff3
 
 [mergetool]
   keepBackup = false
   prompt = false
+  trustExitCode = true
 
 [mergetool "diffmerge"]
   trustExitCode = true
   cmd = /usr/local/bin/diffmerge --merge --result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
 
-[mergetool "meld"]
-  trustExitCode = true
-  cmd = open -W -a Meld --args --auto-merge \"$LOCAL\" \"$BASE\" \"$REMOTE\" --output=\"$MERGED\"
+[bulkworkspaces]
+  projects = /Users/youse/projects
+
+[branch]
+  autoSetupRebase = always

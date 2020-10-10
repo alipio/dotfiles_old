@@ -1,6 +1,5 @@
-# Setup pry
-
-# Pry.editor = 'subl'
+Pry.editor = ENV['EDITOR'] || 'subl -n -w'
+Pry.config.pager = false
 
 # shorthands for the stepping commands
 if defined?(PryByebug)
@@ -10,84 +9,93 @@ if defined?(PryByebug)
   Pry.commands.alias_command 'f', 'finish'
 end
 
+Pry.config.history_file = "~/.local/share/pry/history"
+
 # Hit Enter to repeat last command
-Pry::Commands.command /^$/, "repeat last command" do
-  _pry_.run_command Pry.history.to_a.last
+Pry::Commands.command /^$/, 'repeat last command' do
+  pry_instance.run_command Pry.history.to_a.last
 end
 
-# === History ===
-Pry.config.history.file = File.expand_path('~/.pry_history')
+# Custom prompt
+Pry.config.prompt = Pry::Prompt.new(
+  'custom',
+  'custom prompt',
+  [
+    proc { |obj, nest_level, _| "(#{Pry.config.prompt_name}) ❯❯ " },
+    proc { |obj, nest_level, _| "(#{Pry.config.prompt_name}) *❯ " }
+  ]
+)
 
-# === CUSTOM PROMPT ===
-# This prompt shows the ruby version (useful for RVM)
-Pry.config.prompt_name = File.basename(Dir.pwd)
-prompt_proc = lambda do |obj, nest_level, _|
-  ruby_info = ""
-  ruby_info << "#{Rails.version}\#" if defined?(Rails)
-  ruby_info << RUBY_VERSION
-  ruby_info = "\e[32m#{ruby_info}\e[0m"
-  nest_info = "#{nest_level}"
-  obj_info  = "\e[33m#{obj}\e[0m"
-  "[#{ruby_info}] #{Pry.config.prompt_name} > "
-end
-
-Pry.prompt = [prompt_proc, prompt_proc]
-
-# === Listing config ===
+# Listing config
 # Better colors - by default the headings for methods are too
 # similar to method name colors leading to a "soup"
 # These colors are optimized for use with Solarized scheme
 # for your terminal
-Pry.config.ls.separator = "\n" # new lines between methods
-Pry.config.ls.heading_color = :magenta
-Pry.config.ls.public_method_color = :green
-Pry.config.ls.protected_method_color = :yellow
-Pry.config.ls.private_method_color = :bright_black
+# Pry.config.ls.separator = "\n" # new lines between methods
+# Pry.config.ls.heading_color = :magenta
+# Pry.config.ls.public_method_color = :green
+# Pry.config.ls.protected_method_color = :yellow
+# Pry.config.ls.private_method_color = :bright_black
 
-# == PLUGINS ===
+# Defaults for above config
+#============================
+# heading_color = :bright_blue,
+# public_method_color = :default,
+# private_method_color = :blue,
+# protected_method_color = :blue,
+# method_missing_color = :bright_red,
+# local_var_color = :yellow,
+# pry_var_color = :default, # e.g. _, pry_instance, _file_
+# instance_var_color = :blue, # e.g. @foo
+# class_var_color = :bright_blue, # e.g. @@foo
+# global_var_color = :default, # e.g. $CODERAY_DEBUG, $eventmachine_library
+# builtin_global_color = :cyan, # e.g. $stdin, $-w, $PID
+# pseudo_global_color = :cyan, # e.g. $~, $1..$9, $LAST_MATCH_INFO
+# constant_color = :default, # e.g. VERSION, ARGF
+# class_constant_color = :blue, # e.g. Object, Kernel
+# exception_constant_color = :magenta, # e.g. Exception, RuntimeError
+# unloaded_constant_color = :yellow, # Any constant that is still in .autoload? state
+# separator = "  "
+
+# Plugins
 # awesome_print gem: great syntax colorized printing
-# look at ~/.aprc for more settings for awesome_print
 begin
   require 'awesome_print'
-  AwesomePrint.pry!
-
-  # The following line enables awesome_print for all pry output,
-  # and it also enables paging
-  # Pry.config.print = proc {|output, value| Pry::Helpers::BaseHelpers.stagger_output("=> #{value.ai}", output)}
+  # Enables Awesome Print and auto paging for all Pry output.
+  Pry.config.print = proc { |output, value| Pry::Helpers::BaseHelpers.stagger_output("=> #{value.ai}", output) }
 
   # If you want awesome_print without automatic pagination, use the line below
   # Pry.config.print = proc { |output, value| output.puts value.ai }
-rescue LoadError => err
-  puts "gem install awesome_print  # <-- highly recommended"
+rescue LoadError
+  puts 'no awesome_print :('
 end
 
-# === CUSTOM COMMANDS ===
+# Custom commands
 # from: https://gist.github.com/1297510
 default_command_set = Pry::CommandSet.new do
-  command "copy", "Copy argument to the clip-board" do |str|
-     IO.popen('pbcopy', 'w') { |f| f << str.to_s }
+  command 'clipcp', 'Copy input to the clipboard. If input is not specified, the default is the last result.' do |input|
+    input = input ? target.eval(input) : _pry_.last_result
+    IO.popen('pbcopy', 'w') { |f| f << input.to_s }
   end
 
-  command "clear" do
+  command 'cls' do
     system 'clear'
-    if ENV['RAILS_ENV']
-      output.puts "Rails Environment: " + ENV['RAILS_ENV']
-    end
+    output.puts "Rails Environment: #{ENV['RAILS_ENV']}" if ENV['RAILS_ENV']
   end
 
-  command "sql", "Send sql over AR" do |query|
+  command 'sql', 'Send SQL over ActiveRecord.' do |query|
     if ENV['RAILS_ENV'] || defined?(Rails)
       pp ActiveRecord::Base.connection.select_all(query)
     else
-      pp "No rails env defined"
+      pp 'No rails env defined'
     end
   end
 
-  command "caller_method" do |depth|
+  command 'caller-method' do |depth|
     depth = depth.to_i || 1
     if /^(.+?):(\d+)(?::in `(.*)')?/ =~ caller(depth + 1).first
-      file   = Regexp.last_match[1]
-      line   = Regexp.last_match[2].to_i
+      file = Regexp.last_match[1]
+      line = Regexp.last_match[2].to_i
       method = Regexp.last_match[3]
       output.puts [file, line, method]
     end
@@ -96,17 +104,17 @@ end
 
 Pry.config.commands.import default_command_set
 
-# === CONVENIENCE METHODS ===
-# Stolen from https://gist.github.com/807492
-# Use Array.toy or Hash.toy to get an array or hash to play with
+# Extensions
+# Generate populated arrays and hashes.
+# https://gist.github.com/807492
 class Array
   def self.toy(n=10, &block)
-    block_given? ? Array.new(n,&block) : Array.new(n) {|i| i+1}
+    block_given? ? Array.new(n, &block) : Array.new(n) {|i| i + 1}
   end
 end
 
 class Hash
   def self.toy(n=10)
-    Hash[Array.toy(n).zip(Array.toy(n) {|c| (96+(c+1)).chr})]
+    Hash[Array.toy(n).zip(Array.toy(n) {|c| (96 + ( c + 1)).chr})]
   end
 end
